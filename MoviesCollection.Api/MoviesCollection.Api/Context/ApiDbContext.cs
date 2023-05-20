@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MoviesCollection.Api.Models;
 
 namespace MoviesCollection.Api.Context
 {
-  public class ApiDbContext :DbContext
+  public class ApiDbContext : DbContext
   {
     public ApiDbContext(DbContextOptions<ApiDbContext> options) : base(options) { }
 
@@ -13,5 +14,15 @@ namespace MoviesCollection.Api.Context
     public DbSet<Language> Languages { get; set; }
     public DbSet<Country> Countries { get; set; }
     public DbSet<ParentalRating> ParentalRatings { get; set; }
+    protected override void ConfigureConventions(ModelConfigurationBuilder builder)
+    {
+      builder.Properties<DateOnly>().HaveConversion<DateOnlyConverter>().HaveColumnType("date");
+      base.ConfigureConventions(builder);
+    }
+  }
+
+  public class DateOnlyConverter : ValueConverter<DateOnly, DateTime>
+  {
+    public DateOnlyConverter() : base(dateOnly => dateOnly.ToDateTime(TimeOnly.MinValue), dateTime => DateOnly.FromDateTime(dateTime)) { }
   }
 }
