@@ -20,8 +20,10 @@ if (app.Environment.IsDevelopment())
   app.UseSwaggerUI();
 }
 
+// Adiciona um middleware para redirecionar para https
 app.UseHttpsRedirection();
 
+//Adiciona o middleware que habilita a autorização
 app.UseAuthorization();
 
 app.MapControllers();

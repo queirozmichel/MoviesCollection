@@ -13,20 +13,20 @@ namespace MoviesCollection.Api.Models
 
     public int Id { get; set; }
 
-    [Required]
-    [StringLength(100)]
+    [Required(ErrorMessage ="Description é obrigatório.")]
+    [StringLength(100, ErrorMessage ="Description deve ter no máximo {1} caracteres.")]
     public string? Description { get; set; }
 
-    [Required]
-    [StringLength(500)]
+    [Required(ErrorMessage = "Violence é obrigatório.")]
+    [StringLength(500, ErrorMessage = "Violence deve ter no máximo {1} caracteres.")]
     public string? Violence { get; set; }
 
-    [Required]
-    [StringLength(500)]
+    [Required(ErrorMessage = "SexAndNudity é obrigatório.")]
+    [StringLength(500, ErrorMessage = "SexAndNudity deve ter no máximo {1} caracteres.")]
     public string? SexAndNudity { get; set; }
 
-    [Required]
-    [StringLength(500)]
+    [Required(ErrorMessage = "Drugs é obrigatório.")]
+    [StringLength(500, ErrorMessage = "Drugs deve ter no máximo {1} caracteres.")]
     public string? Drugs { get; set; }
 
     public byte[]? Image { get; set; }

@@ -13,8 +13,8 @@ namespace MoviesCollection.Api.Models
 
     public int Id { get; set; }
 
-    [Required]
-    [StringLength(50)]
+    [Required(ErrorMessage = "Name é obrigatório.")]
+    [StringLength(50, ErrorMessage = "Name deve ter no máximo {1} caracteres.")]
     public string? Name { get; set; }
 
     public byte[]? Image { get; set; }
