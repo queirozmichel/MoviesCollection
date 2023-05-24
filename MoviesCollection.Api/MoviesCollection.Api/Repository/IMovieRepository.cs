@@ -4,5 +4,6 @@ namespace MoviesCollection.Api.Repository
 {
   public interface IMovieRepository : IRepository<Movie>
   {
+    new IEnumerable<Movie> Get();
   }
 }

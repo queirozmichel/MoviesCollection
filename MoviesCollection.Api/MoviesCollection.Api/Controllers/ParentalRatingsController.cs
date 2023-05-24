@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MoviesCollection.Api.Context;
 using MoviesCollection.Api.Models;
+using MoviesCollection.Api.Repository;
 
 namespace MoviesCollection.Api.Controllers
 {
@@ -9,21 +8,21 @@ namespace MoviesCollection.Api.Controllers
   [ApiController]
   public class ParentalRatingsController : ControllerBase
   {
-    private readonly ApiDbContext _context;
+    private readonly IUnitOfWork _context;
 
-    public ParentalRatingsController(ApiDbContext context)
+    public ParentalRatingsController(IUnitOfWork context)
     {
       _context = context;
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ParentalRating>>> Get()
+    public ActionResult<IEnumerable<ParentalRating>> Get()
     {
       List<ParentalRating> parentalRatings = new();
 
       try
       {
-        parentalRatings = await _context.ParentalRatings.AsNoTracking().ToListAsync();
+        parentalRatings = _context.ParentalRatingRepository.Get().ToList();
       }
       catch (Exception)
       {
@@ -38,13 +37,13 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpGet("{id:int:min(1)}", Name = "GetParentalRating")]
-    public async Task<ActionResult<ParentalRating>> Get(int id)
+    public ActionResult<ParentalRating> Get(int id)
     {
       ParentalRating? parentalRating = new();
 
       try
       {
-        parentalRating = await _context.ParentalRatings.AsNoTracking().FirstOrDefaultAsync(parentalRating => parentalRating.Id == id);
+        parentalRating = _context.ParentalRatingRepository.GetById(parentalRating => parentalRating.Id == id);
       }
       catch (Exception)
       {
@@ -59,7 +58,7 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpPost]
-    public async Task<ActionResult> Post(ParentalRating parentalRating)
+    public ActionResult Post(ParentalRating parentalRating)
     {
       if (parentalRating is null)
       {
@@ -67,8 +66,8 @@ namespace MoviesCollection.Api.Controllers
       }
       try
       {
-        await _context.ParentalRatings.AddAsync(parentalRating);
-        await _context.SaveChangesAsync();
+        _context.ParentalRatingRepository.Add(parentalRating);
+        _context.Commit();
       }
       catch (Exception)
       {
@@ -78,7 +77,7 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpPut("{id:int:min(1)}")]
-    public async Task<ActionResult> Put(int id, ParentalRating parentalRating)
+    public ActionResult Put(int id, ParentalRating parentalRating)
     {
       if (id != parentalRating.Id)
       {
@@ -86,8 +85,8 @@ namespace MoviesCollection.Api.Controllers
       }
       try
       {
-        _context.Entry(parentalRating).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
+        _context.ParentalRatingRepository.Update(parentalRating);
+        _context.Commit();
       }
       catch (Exception)
       {
@@ -97,13 +96,13 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpDelete("{id:int:min(1)}")]
-    public async Task<ActionResult> Delete(int id)
+    public ActionResult Delete(int id)
     {
       ParentalRating? parentalRating = new();
 
       try
       {
-        parentalRating = await _context.ParentalRatings.AsNoTracking().FirstOrDefaultAsync(parentalRating => parentalRating.Id == id);
+        parentalRating = _context.ParentalRatingRepository.GetById(parentalRating => parentalRating.Id == id);
       }
       catch (Exception)
       {
@@ -117,8 +116,8 @@ namespace MoviesCollection.Api.Controllers
 
       try
       {
-        _context.ParentalRatings.Remove(parentalRating);
-        await _context.SaveChangesAsync();
+        _context.ParentalRatingRepository.Delete(parentalRating);
+        _context.Commit();
       }
       catch (Exception)
       {

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MoviesCollection.Api.Context;
 using MoviesCollection.Api.Models;
+using MoviesCollection.Api.Repository;
 
 namespace MoviesCollection.Api.Controllers
 {
@@ -9,22 +8,21 @@ namespace MoviesCollection.Api.Controllers
   [ApiController]
   public class MoviesController : ControllerBase
   {
-    private readonly ApiDbContext _context;
+    private readonly IUnitOfWork _context;
 
-    public MoviesController(ApiDbContext context)
+    public MoviesController(IUnitOfWork context)
     {
       _context = context;
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Movie>>> Get()
+    public ActionResult<IEnumerable<Movie>> Get()
     {
       List<Movie> movies = new();
 
       try
       {
-        movies = await _context.Movies.AsNoTracking().Include(g => g.Genre).Include(d => d.Director).Include(c => c.Country)
-        .Include(l => l.Language).Include(p => p.ParentalRating).ToListAsync();
+        movies = _context.MovieRepository.Get().ToList();
       }
       catch (Exception)
       {
@@ -40,13 +38,13 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpGet("{id:int:min(1)}", Name = "GetMovie")]
-    public async Task<ActionResult<Movie>> Get(int id)
+    public ActionResult<Movie> Get(int id)
     {
       Movie? movie = new();
 
       try
       {
-        movie = await _context.Movies.AsNoTracking().FirstOrDefaultAsync(movie => movie.Id == id);
+        movie = _context.MovieRepository.GetById(movie => movie.Id == id);
       }
       catch (Exception)
       {
@@ -62,7 +60,7 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpPost]
-    public async Task<ActionResult> Post(Movie movie)
+    public ActionResult Post(Movie movie)
     {
       if (movie == null)
       {
@@ -71,8 +69,8 @@ namespace MoviesCollection.Api.Controllers
 
       try
       {
-        await _context.Movies.AddAsync(movie);
-        await _context.SaveChangesAsync();
+        _context.MovieRepository.Add(movie);
+        _context.Commit();
       }
       catch (Exception)
       {
@@ -83,7 +81,7 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpPut("{id:int:min(1)}")]
-    public async Task<ActionResult> Put(int id, Movie movie)
+    public ActionResult Put(int id, Movie movie)
     {
       if (id != movie.Id)
       {
@@ -92,8 +90,8 @@ namespace MoviesCollection.Api.Controllers
 
       try
       {
-        _context.Entry(movie).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
+        _context.MovieRepository.Update(movie);
+        _context.Commit();
       }
       catch (Exception)
       {
@@ -104,13 +102,13 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpDelete("{id:int:min(1)}")]
-    public async Task<ActionResult> Delete(int id)
+    public ActionResult Delete(int id)
     {
       Movie? movie = new();
 
       try
       {
-        movie = await _context.Movies.AsNoTracking().FirstOrDefaultAsync(_movie => _movie.Id == id);
+        movie = _context.MovieRepository.GetById(_movie => _movie.Id == id);
       }
       catch (Exception)
       {
@@ -124,8 +122,8 @@ namespace MoviesCollection.Api.Controllers
 
       try
       {
-        _context.Movies.Remove(movie);
-        await _context.SaveChangesAsync();
+        _context.MovieRepository.Delete(movie);
+        _context.Commit();
       }
       catch (Exception)
       {
