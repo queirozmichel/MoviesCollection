@@ -5,7 +5,7 @@ using MoviesCollection.Api.Models;
 
 namespace MoviesCollection.Api.Controllers
 {
-  [Route("[controller]")]
+  [Route("api/languages")]
   [ApiController]
   public class LanguagesController : ControllerBase
   {
@@ -17,13 +17,13 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<Language>> Get()
+    public async Task<ActionResult<IEnumerable<Language>>> Get()
     {
       List<Language> languages = new();
 
       try
       {
-        languages = _context.Languages.AsNoTracking().ToList();
+        languages = await _context.Languages.AsNoTracking().ToListAsync();
       }
       catch (Exception)
       {
@@ -38,13 +38,13 @@ namespace MoviesCollection.Api.Controllers
       return languages;
     }
 
-    [HttpGet("{id:int}", Name = "GetLanguage")]
-    public ActionResult<Language> Get(int id)
+    [HttpGet("{id:int:min(1)}", Name = "GetLanguage")]
+    public async Task<ActionResult<Language>> Get(int id)
     {
       Language? language = new();
       try
       {
-        language = _context.Languages.AsNoTracking().FirstOrDefault(language => language.Id == id);
+        language = await _context.Languages.AsNoTracking().FirstOrDefaultAsync(language => language.Id == id);
       }
       catch (Exception)
       {
@@ -60,7 +60,7 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpPost]
-    public ActionResult Post(Language language)
+    public async Task<ActionResult> Post(Language language)
     {
       if (language is null)
       {
@@ -68,8 +68,8 @@ namespace MoviesCollection.Api.Controllers
       }
       try
       {
-        _context.Languages.Add(language);
-        _context.SaveChanges();
+        await _context.Languages.AddAsync(language);
+        await _context.SaveChangesAsync();
       }
       catch (Exception)
       {
@@ -79,8 +79,8 @@ namespace MoviesCollection.Api.Controllers
       return new CreatedAtRouteResult("GetLanguage", new { id = language.Id }, language);
     }
 
-    [HttpPut("{id:int}")]
-    public ActionResult Put(int id, Language language)
+    [HttpPut("{id:int:min(1)}")]
+    public async Task<ActionResult> Put(int id, Language language)
     {
       if (id != language.Id)
       {
@@ -90,7 +90,7 @@ namespace MoviesCollection.Api.Controllers
       try
       {
         _context.Entry(language).State = EntityState.Modified;
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
       }
       catch (Exception)
       {
@@ -100,14 +100,14 @@ namespace MoviesCollection.Api.Controllers
       return Ok(language);
     }
 
-    [HttpDelete("{id:int}")]
-    public ActionResult Delete(int id)
+    [HttpDelete("{id:int:min(1)}")]
+    public async Task<ActionResult> Delete(int id)
     {
       Language? language = new();
 
       try
       {
-        language = _context.Languages.AsNoTracking().FirstOrDefault(language => language.Id == id);
+        language = await _context.Languages.AsNoTracking().FirstOrDefaultAsync(language => language.Id == id);
       }
       catch (Exception)
       {
@@ -122,7 +122,7 @@ namespace MoviesCollection.Api.Controllers
       try
       {
         _context.Languages.Remove(language);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
       }
       catch (Exception)
       {

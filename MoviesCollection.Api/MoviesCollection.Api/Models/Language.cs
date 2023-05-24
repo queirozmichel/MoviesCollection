@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace MoviesCollection.Api.Models
 {
@@ -20,6 +21,7 @@ namespace MoviesCollection.Api.Models
     [StringLength(10)]
     public string? LanguageCode { get; set; }
 
+    [JsonIgnore]
     public ICollection<Movie>? Movies { get; set; }
   }
 }

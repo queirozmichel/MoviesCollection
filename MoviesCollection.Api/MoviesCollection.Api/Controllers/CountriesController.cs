@@ -5,7 +5,7 @@ using MoviesCollection.Api.Models;
 
 namespace MoviesCollection.Api.Controllers
 {
-  [Route("[controller]")]
+  [Route("api/countries")]
   [ApiController]
   public class CountriesController : ControllerBase
   {
@@ -17,13 +17,13 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<Country>> Get()
+    public async Task<ActionResult<IEnumerable<Country>>> Get()
     {
       List<Country> countries = new();
 
       try
       {
-        countries = _context.Countries.AsNoTracking().ToList();
+        countries = await _context.Countries.AsNoTracking().ToListAsync();
       }
       catch (Exception)
       {
@@ -38,14 +38,14 @@ namespace MoviesCollection.Api.Controllers
       return countries;
     }
 
-    [HttpGet("{id:int}", Name = "GetCountry")]
-    public ActionResult<Country> Get(int id)
+    [HttpGet("{id:int:min(1)}", Name = "GetCountry")]
+    public async Task<ActionResult<Country>> Get(int id)
     {
       Country? country = new();
 
       try
       {
-        country = _context.Countries.AsNoTracking().FirstOrDefault(country => country.Id == id);
+        country = await _context.Countries.AsNoTracking().FirstOrDefaultAsync(country => country.Id == id);
       }
       catch (Exception)
       {
@@ -61,7 +61,7 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpPost]
-    public ActionResult Post(Country country)
+    public async Task<ActionResult> Post(Country country)
     {
       if (country is null)
       {
@@ -70,8 +70,8 @@ namespace MoviesCollection.Api.Controllers
 
       try
       {
-        _context.Countries.Add(country);
-        _context.SaveChanges();
+       await _context.Countries.AddAsync(country);
+       await _context.SaveChangesAsync();
       }
       catch (Exception)
       {
@@ -81,8 +81,8 @@ namespace MoviesCollection.Api.Controllers
       return new CreatedAtRouteResult("GetCountry", new { id = country.Id }, country);
     }
 
-    [HttpPut("{id:int}")]
-    public ActionResult Put(int id, Country country)
+    [HttpPut("{id:int:min(1)}")]
+    public async Task<ActionResult> Put(int id, Country country)
     {
       if (id != country.Id)
       {
@@ -92,7 +92,7 @@ namespace MoviesCollection.Api.Controllers
       try
       {
         _context.Entry(country).State = EntityState.Modified;
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
       }
       catch (Exception)
       {
@@ -102,14 +102,14 @@ namespace MoviesCollection.Api.Controllers
       return Ok(country);
     }
 
-    [HttpDelete("{id:int}")]
-    public ActionResult Delete(int id)
+    [HttpDelete("{id:int:min(1)}")]
+    public async Task<ActionResult> Delete(int id)
     {
       Country? country = new();
 
       try
       {
-        country = _context.Countries.AsNoTracking().FirstOrDefault(country => country.Id == id);
+        country = await _context.Countries.AsNoTracking().FirstOrDefaultAsync(country => country.Id == id);
       }
       catch (Exception)
       {
@@ -124,7 +124,7 @@ namespace MoviesCollection.Api.Controllers
       try
       {
         _context.Countries.Remove(country);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
       }
       catch (Exception)
       {

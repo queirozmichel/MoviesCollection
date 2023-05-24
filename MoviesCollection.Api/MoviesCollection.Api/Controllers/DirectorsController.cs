@@ -5,7 +5,7 @@ using MoviesCollection.Api.Models;
 
 namespace MoviesCollection.Api.Controllers
 {
-  [Route("[controller]")]
+  [Route("api/directors")]
   [ApiController]
   public class DirectorsController : ControllerBase
   {
@@ -17,13 +17,13 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<Director>> Get()
+    public async Task<ActionResult<IEnumerable<Director>>> Get()
     {
       List<Director>? directors = new();
 
       try
       {
-        directors = _context.Directors.AsNoTracking().ToList();
+        directors = await _context.Directors.AsNoTracking().ToListAsync();
       }
       catch (Exception)
       {
@@ -37,13 +37,13 @@ namespace MoviesCollection.Api.Controllers
       return directors;
     }
 
-    [HttpGet("{id:int}", Name = "GetDirector")]
-    public ActionResult<Director> Get(int id)
+    [HttpGet("{id:int:min(1)}", Name = "GetDirector")]
+    public async Task<ActionResult<Director>> Get(int id)
     {
       Director? director = new();
       try
       {
-        director = _context.Directors.AsNoTracking().FirstOrDefault(x => x.Id == id);
+        director = await _context.Directors.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
       }
       catch (Exception)
       {
@@ -58,7 +58,7 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpPost]
-    public ActionResult Post(Director director)
+    public async Task<ActionResult> Post(Director director)
     {
       if (director is null)
       {
@@ -67,8 +67,8 @@ namespace MoviesCollection.Api.Controllers
 
       try
       {
-        _context.Add(director);
-        _context.SaveChanges();
+        await _context.AddAsync(director);
+        await _context.SaveChangesAsync();
       }
       catch (Exception)
       {
@@ -78,8 +78,8 @@ namespace MoviesCollection.Api.Controllers
       return new CreatedAtRouteResult("GetDirector", new { id = director.Id }, director);
     }
 
-    [HttpPut("{id:int}")]
-    public ActionResult Put(int id, Director director)
+    [HttpPut("{id:int:min(1)}")]
+    public async Task<ActionResult> Put(int id, Director director)
     {
       if (id != director.Id)
       {
@@ -89,7 +89,7 @@ namespace MoviesCollection.Api.Controllers
       try
       {
         _context.Entry(director).State = EntityState.Modified;
-        _context.SaveChanges();
+       await _context.SaveChangesAsync();
       }
       catch (Exception)
       {
@@ -99,14 +99,14 @@ namespace MoviesCollection.Api.Controllers
       return Ok(director);
     }
 
-    [HttpDelete("{id:int}")]
-    public ActionResult Delete(int id)
+    [HttpDelete("{id:int:min(1)}")]
+    public async Task<ActionResult> Delete(int id)
     {
       Director? director = new();
 
       try
       {
-        director = _context.Directors.AsNoTracking().FirstOrDefault(director => director.Id == id);
+        director = await _context.Directors.AsNoTracking().FirstOrDefaultAsync(director => director.Id == id);
       }
       catch (Exception)
       {
@@ -121,7 +121,7 @@ namespace MoviesCollection.Api.Controllers
       try
       {
         _context.Directors.Remove(director);
-        _context.SaveChanges();
+       await _context.SaveChangesAsync();
       }
       catch (Exception)
       {

@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 using MoviesCollection.Api.Context;
 using MoviesCollection.Api.Models;
 
 namespace MoviesCollection.Api.Controllers
 {
-  [Route("[controller]")]
+  [Route("api/movies")]
   [ApiController]
   public class MoviesController : ControllerBase
   {
@@ -15,17 +14,17 @@ namespace MoviesCollection.Api.Controllers
     public MoviesController(ApiDbContext context)
     {
       _context = context;
-    }    
+    }
 
     [HttpGet]
-    public ActionResult<IEnumerable<Movie>> Get()
+    public async Task<ActionResult<IEnumerable<Movie>>> Get()
     {
       List<Movie> movies = new();
 
       try
       {
-        movies = _context.Movies.AsNoTracking().Include(g => g.Genre).Include(d => d.Director).Include(c => c.Country)
-        .Include(l => l.Language).Include(p => p.ParentalRating).ToList();
+        movies = await _context.Movies.AsNoTracking().Include(g => g.Genre).Include(d => d.Director).Include(c => c.Country)
+        .Include(l => l.Language).Include(p => p.ParentalRating).ToListAsync();
       }
       catch (Exception)
       {
@@ -40,14 +39,14 @@ namespace MoviesCollection.Api.Controllers
       return movies;
     }
 
-    [HttpGet("{id:int}", Name = "GetMovie")]
-    public ActionResult<Movie> Get(int id)
+    [HttpGet("{id:int:min(1)}", Name = "GetMovie")]
+    public async Task<ActionResult<Movie>> Get(int id)
     {
       Movie? movie = new();
 
       try
       {
-        movie = _context.Movies.AsNoTracking().FirstOrDefault(movie => movie.Id == id);
+        movie = await _context.Movies.AsNoTracking().FirstOrDefaultAsync(movie => movie.Id == id);
       }
       catch (Exception)
       {
@@ -63,7 +62,7 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpPost]
-    public ActionResult Post(Movie movie)
+    public async Task<ActionResult> Post(Movie movie)
     {
       if (movie == null)
       {
@@ -72,8 +71,8 @@ namespace MoviesCollection.Api.Controllers
 
       try
       {
-        _context.Movies.Add(movie);
-        _context.SaveChanges();
+        await _context.Movies.AddAsync(movie);
+        await _context.SaveChangesAsync();
       }
       catch (Exception)
       {
@@ -83,8 +82,8 @@ namespace MoviesCollection.Api.Controllers
       return new CreatedAtRouteResult("GetMovie", new { id = movie.Id }, movie);
     }
 
-    [HttpPut("{id:int}")]
-    public ActionResult Put(int id, Movie movie)
+    [HttpPut("{id:int:min(1)}")]
+    public async Task<ActionResult> Put(int id, Movie movie)
     {
       if (id != movie.Id)
       {
@@ -94,7 +93,7 @@ namespace MoviesCollection.Api.Controllers
       try
       {
         _context.Entry(movie).State = EntityState.Modified;
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
       }
       catch (Exception)
       {
@@ -104,14 +103,14 @@ namespace MoviesCollection.Api.Controllers
       return Ok(movie);
     }
 
-    [HttpDelete("{id:int}")]
-    public ActionResult Delete(int id)
+    [HttpDelete("{id:int:min(1)}")]
+    public async Task<ActionResult> Delete(int id)
     {
       Movie? movie = new();
 
       try
       {
-        movie = _context.Movies.AsNoTracking().FirstOrDefault(_movie => _movie.Id == id);
+        movie = await _context.Movies.AsNoTracking().FirstOrDefaultAsync(_movie => _movie.Id == id);
       }
       catch (Exception)
       {
@@ -126,7 +125,7 @@ namespace MoviesCollection.Api.Controllers
       try
       {
         _context.Movies.Remove(movie);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
       }
       catch (Exception)
       {

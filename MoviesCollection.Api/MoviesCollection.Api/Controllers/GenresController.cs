@@ -5,7 +5,7 @@ using MoviesCollection.Api.Models;
 
 namespace MoviesCollection.Api.Controllers
 {
-  [Route("[controller]")]
+  [Route("api/genres")]
   [ApiController]
   public class GenresController : ControllerBase
   {
@@ -17,13 +17,13 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<Genre>> Get()
+    public async Task<ActionResult<IEnumerable<Genre>>> Get()
     {
       List<Genre> genres = new();
 
       try
       {
-        genres = _context.Genres.AsNoTracking().ToList();
+        genres = await _context.Genres.AsNoTracking().ToListAsync();
       }
       catch (Exception)
       {
@@ -38,13 +38,13 @@ namespace MoviesCollection.Api.Controllers
       return genres;
     }
 
-    [HttpGet("{id:int}", Name = "GetGenre")]
-    public ActionResult<Genre> Get(int id)
+    [HttpGet("{id:int:min(1)}", Name = "GetGenre")]
+    public async Task<ActionResult<Genre>> Get(int id)
     {
       Genre? genre = new();
       try
       {
-        genre = _context.Genres.AsNoTracking().FirstOrDefault(genre => genre.Id == id);
+        genre = await _context.Genres.AsNoTracking().FirstOrDefaultAsync(genre => genre.Id == id);
       }
       catch (Exception)
       {
@@ -60,7 +60,7 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpPost]
-    public ActionResult Post(Genre genre)
+    public async Task<ActionResult> Post(Genre genre)
     {
       if (genre is null)
       {
@@ -69,8 +69,8 @@ namespace MoviesCollection.Api.Controllers
 
       try
       {
-        _context.Genres.Add(genre);
-        _context.SaveChanges();
+        await _context.Genres.AddAsync(genre);
+        await _context.SaveChangesAsync();
       }
       catch (Exception)
       {
@@ -80,8 +80,8 @@ namespace MoviesCollection.Api.Controllers
       return new CreatedAtRouteResult("GetGenre", new { id = genre.Id }, genre);
     }
 
-    [HttpPut("{id:int}")]
-    public ActionResult Put(int id, Genre genre)
+    [HttpPut("{id:int:min(1)}")]
+    public async Task<ActionResult> Put(int id, Genre genre)
     {
       if (id != genre.Id)
       {
@@ -91,7 +91,7 @@ namespace MoviesCollection.Api.Controllers
       try
       {
         _context.Entry(genre).State = EntityState.Modified;
-        _context.SaveChanges();
+       await _context.SaveChangesAsync();
       }
       catch (Exception)
       {
@@ -101,14 +101,14 @@ namespace MoviesCollection.Api.Controllers
       return Ok(genre);
     }
 
-    [HttpDelete("{id:int}")]
-    public ActionResult Delete(int id)
+    [HttpDelete("{id:int:min(1)}")]
+    public async Task<ActionResult> Delete(int id)
     {
       Genre? genre = new();
 
       try
       {
-        genre = _context.Genres.AsNoTracking().FirstOrDefault(genre => genre.Id == id);
+        genre = await _context.Genres.AsNoTracking().FirstOrDefaultAsync(genre => genre.Id == id);
       }
       catch (Exception)
       {
@@ -123,7 +123,7 @@ namespace MoviesCollection.Api.Controllers
       try
       {
         _context.Genres.Remove(genre);
-        _context.SaveChanges();
+       await _context.SaveChangesAsync();
       }
       catch (Exception)
       {
