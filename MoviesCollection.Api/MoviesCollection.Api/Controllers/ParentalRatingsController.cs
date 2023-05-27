@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using MoviesCollection.Api.DTOs;
 using MoviesCollection.Api.Models;
 using MoviesCollection.Api.Repository;
 
@@ -9,16 +11,19 @@ namespace MoviesCollection.Api.Controllers
   public class ParentalRatingsController : ControllerBase
   {
     private readonly IUnitOfWork _context;
+    private IMapper _mapper;
 
-    public ParentalRatingsController(IUnitOfWork context)
+    public ParentalRatingsController(IUnitOfWork context, IMapper mapper)
     {
       _context = context;
+      _mapper = mapper;
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<ParentalRating>> Get()
+    public ActionResult<IEnumerable<ParentalRatingDTO>> Get()
     {
       List<ParentalRating> parentalRatings = new();
+      List<ParentalRatingDTO> parentalRatingsDTO = new();
 
       try
       {
@@ -33,13 +38,16 @@ namespace MoviesCollection.Api.Controllers
       {
         return NotFound("Classificações indicativas não encontradas");
       }
-      return parentalRatings;
+
+      parentalRatingsDTO = _mapper.Map<List<ParentalRatingDTO>>(parentalRatings);
+      return parentalRatingsDTO;
     }
 
     [HttpGet("{id:int:min(1)}", Name = "GetParentalRating")]
-    public ActionResult<ParentalRating> Get(int id)
+    public ActionResult<ParentalRatingDTO> Get(int id)
     {
       ParentalRating? parentalRating = new();
+      ParentalRatingDTO parentalRatingDTO = new();
 
       try
       {
@@ -54,12 +62,17 @@ namespace MoviesCollection.Api.Controllers
       {
         return NotFound($"Classificação indicativa com id {id} não encontrada");
       }
-      return parentalRating;
+
+      parentalRatingDTO = _mapper.Map<ParentalRatingDTO>(parentalRating);
+      return parentalRatingDTO;
     }
 
     [HttpPost]
-    public ActionResult Post(ParentalRating parentalRating)
+    public ActionResult Post(ParentalRatingDTO parentalRatingDto)
     {
+      ParentalRating parentalRating = _mapper.Map<ParentalRating>(parentalRatingDto);
+      ParentalRatingDTO parentalRatingDTO = new();
+
       if (parentalRating is null)
       {
         return BadRequest();
@@ -73,18 +86,34 @@ namespace MoviesCollection.Api.Controllers
       {
         return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um problema ao tentar executar a sua solicitação.");
       }
-      return new CreatedAtRouteResult("GetParentalRating", new { id = parentalRating.Id }, parentalRating);
+
+      parentalRatingDTO = _mapper.Map<ParentalRatingDTO>(parentalRating);
+      return new CreatedAtRouteResult("GetParentalRating", new { id = parentalRating.Id }, parentalRatingDTO);
     }
 
     [HttpPut("{id:int:min(1)}")]
-    public ActionResult Put(int id, ParentalRating parentalRating)
+    public ActionResult Put(int id, ParentalRatingDTO parentalRatingDto)
     {
-      if (id != parentalRating.Id)
+      ParentalRating parentalRating = new();
+
+      if (id != parentalRatingDto.Id)
       {
         return BadRequest("Os id's são diferentes.");
       }
+
       try
       {
+        parentalRating = _context.ParentalRatingRepository.GetById(x => x.Id == id);
+
+        if (parentalRating is null)
+        {
+          return NotFound($"Classificação indicativa com id {id} não encontrada");
+        }
+        else
+        {
+          parentalRating = _mapper.Map<ParentalRating>(parentalRatingDto);
+        }
+
         _context.ParentalRatingRepository.Update(parentalRating);
         _context.Commit();
       }
@@ -92,13 +121,14 @@ namespace MoviesCollection.Api.Controllers
       {
         return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um problema ao tentar executar a sua solicitação.");
       }
-      return Ok(parentalRating);
+      return Ok();
     }
 
     [HttpDelete("{id:int:min(1)}")]
-    public ActionResult Delete(int id)
+    public ActionResult<ParentalRatingDTO> Delete(int id)
     {
       ParentalRating? parentalRating = new();
+      ParentalRatingDTO parentalRatingDTO = new();
 
       try
       {
@@ -124,7 +154,8 @@ namespace MoviesCollection.Api.Controllers
         return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um problema ao tentar executar a sua solicitação.");
       }
 
-      return Ok(parentalRating);
+      parentalRatingDTO = _mapper.Map<ParentalRatingDTO>(parentalRating);
+      return Ok(parentalRatingDTO);
     }
   }
 }

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using MoviesCollection.Api.DTOs;
 using MoviesCollection.Api.Models;
 using MoviesCollection.Api.Repository;
 
@@ -9,16 +11,19 @@ namespace MoviesCollection.Api.Controllers
   public class LanguagesController : ControllerBase
   {
     private readonly IUnitOfWork _context;
+    private IMapper _mapper;
 
-    public LanguagesController(IUnitOfWork context)
+    public LanguagesController(IUnitOfWork context, IMapper mapper)
     {
       _context = context;
+      _mapper = mapper;
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<Language>> Get()
+    public ActionResult<IEnumerable<LanguageDTO>> Get()
     {
       List<Language> languages = new();
+      List<LanguageDTO> languagesDTO = new();
 
       try
       {
@@ -34,13 +39,16 @@ namespace MoviesCollection.Api.Controllers
         return NotFound("Idiomas não encontrados.");
       }
 
-      return languages;
+      languagesDTO = _mapper.Map<List<LanguageDTO>>(languages);
+      return languagesDTO;
     }
 
     [HttpGet("{id:int:min(1)}", Name = "GetLanguage")]
-    public ActionResult<Language> Get(int id)
+    public ActionResult<LanguageDTO> Get(int id)
     {
       Language? language = new();
+      LanguageDTO languageDTO = new();
+
       try
       {
         language = _context.LanguageRepository.GetById(language => language.Id == id);
@@ -55,16 +63,21 @@ namespace MoviesCollection.Api.Controllers
         return NotFound($"Idioma com o id {id} não encontrado.");
       }
 
-      return language;
+      languageDTO = _mapper.Map<LanguageDTO>(language);
+      return languageDTO;
     }
 
     [HttpPost]
-    public ActionResult Post(Language language)
+    public ActionResult Post(LanguageDTO languageDto)
     {
+      Language language = _mapper.Map<Language>(languageDto);
+      LanguageDTO languageDTO = new();
+
       if (language is null)
       {
         return BadRequest();
       }
+
       try
       {
         _context.LanguageRepository.Add(language);
@@ -75,19 +88,33 @@ namespace MoviesCollection.Api.Controllers
         return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um problema ao tentar executar a sua solicitação.");
       }
 
-      return new CreatedAtRouteResult("GetLanguage", new { id = language.Id }, language);
+      languageDTO = _mapper.Map<LanguageDTO>(language);
+      return new CreatedAtRouteResult("GetLanguage", new { id = language.Id }, languageDTO);
     }
 
     [HttpPut("{id:int:min(1)}")]
-    public ActionResult Put(int id, Language language)
+    public ActionResult Put(int id, LanguageDTO languageDto)
     {
-      if (id != language.Id)
+      Language language = new();
+
+      if (id != languageDto.Id)
       {
         return BadRequest("Os id's são diferentes");
       }
 
       try
       {
+        language = _context.LanguageRepository.GetById(x => x.Id == id);
+
+        if (language is null)
+        {
+          return NotFound($"Idioma com o id {id} não encontrado.");
+        }
+        else
+        {
+          language = _mapper.Map<Language>(languageDto);
+        }
+
         _context.LanguageRepository.Update(language);
         _context.Commit();
       }
@@ -96,13 +123,14 @@ namespace MoviesCollection.Api.Controllers
         return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um problema ao tentar executar a sua solicitação.");
       }
 
-      return Ok(language);
+      return Ok();
     }
 
     [HttpDelete("{id:int:min(1)}")]
-    public ActionResult Delete(int id)
+    public ActionResult<LanguageDTO> Delete(int id)
     {
       Language? language = new();
+      LanguageDTO languageDTO= new();
 
       try
       {
@@ -128,7 +156,8 @@ namespace MoviesCollection.Api.Controllers
         return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um problema ao tentar executar a sua solicitação.");
       }
 
-      return Ok(language);
+      languageDTO = _mapper.Map<LanguageDTO>(language);
+      return Ok(languageDTO);
     }
   }
 }

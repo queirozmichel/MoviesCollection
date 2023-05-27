@@ -1,13 +1,18 @@
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using MoviesCollection.Api.Context;
+using MoviesCollection.Api.DTOs.Mappings;
 using MoviesCollection.Api.Repository;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args); //Equivalente ao ConfigureServices()
+var mappingConfig = new MapperConfiguration(mc => { mc.AddProfile(new MappingProfile()); }); //AutoMapper
+IMapper mapper = mappingConfig.CreateMapper(); //AutoMapper
 
 // Add services to the container.
 string? mySqlServerConnection = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddScoped<IUnitOfWork, UnityOfWork>();
+builder.Services.AddScoped<IUnitOfWork, UnityOfWork>(); //Unity Of Work
+builder.Services.AddSingleton(mapper); //AutoMapper
 builder.Services.AddDbContext<ApiDbContext>(options => options.UseSqlServer(mySqlServerConnection));
 builder.Services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddEndpointsApiExplorer();

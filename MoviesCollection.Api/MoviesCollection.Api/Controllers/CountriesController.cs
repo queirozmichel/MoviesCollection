@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using MoviesCollection.Api.DTOs;
 using MoviesCollection.Api.Models;
 using MoviesCollection.Api.Repository;
 
@@ -9,16 +11,19 @@ namespace MoviesCollection.Api.Controllers
   public class CountriesController : ControllerBase
   {
     private readonly IUnitOfWork _context;
+    private readonly IMapper _mapper;
 
-    public CountriesController(IUnitOfWork context)
+    public CountriesController(IUnitOfWork context, IMapper mapper)
     {
       _context = context;
+      _mapper = mapper;
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<Country>> Get()
+    public ActionResult<IEnumerable<CountryDTO>> Get()
     {
       List<Country> countries = new();
+      List<CountryDTO> countriesDTO = new();
 
       try
       {
@@ -34,13 +39,15 @@ namespace MoviesCollection.Api.Controllers
         return NotFound("Países não foram encontrados.");
       }
 
-      return countries;
+      countriesDTO = _mapper.Map<List<CountryDTO>>(countries);
+      return countriesDTO;
     }
 
     [HttpGet("{id:int:min(1)}", Name = "GetCountry")]
-    public ActionResult<Country> Get(int id)
+    public ActionResult<CountryDTO> Get(int id)
     {
       Country? country = new();
+      CountryDTO? countryDTO = new();
 
       try
       {
@@ -56,12 +63,16 @@ namespace MoviesCollection.Api.Controllers
         return NotFound($"País com o id {id} não encontrado.");
       }
 
-      return country;
+      countryDTO = _mapper.Map<CountryDTO>(country);
+      return countryDTO;
     }
 
     [HttpPost]
-    public ActionResult Post(Country country)
+    public ActionResult Post(CountryDTO countryDto)
     {
+      Country country = _mapper.Map<Country>(countryDto);
+      CountryDTO countryDTO = new();
+
       if (country is null)
       {
         return BadRequest();
@@ -69,27 +80,41 @@ namespace MoviesCollection.Api.Controllers
 
       try
       {
-       _context.CountryRepository.Add(country);
-       _context.Commit();
+        _context.CountryRepository.Add(country);
+        _context.Commit();
       }
       catch (Exception)
       {
         return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um problema ao tentar executar a sua solicitação.");
       }
 
-      return new CreatedAtRouteResult("GetCountry", new { id = country.Id }, country);
+      countryDTO = _mapper.Map<CountryDTO>(country);
+      return new CreatedAtRouteResult("GetCountry", new { id = country.Id }, countryDTO);
     }
 
     [HttpPut("{id:int:min(1)}")]
-    public ActionResult Put(int id, Country country)
+    public ActionResult Put(int id, CountryDTO countryDto)
     {
-      if (id != country.Id)
+      Country country = new();
+
+      if (id != countryDto.Id)
       {
         return BadRequest("Os id's são diferentes");
       }
 
       try
       {
+        country = _context.CountryRepository.GetById(x => x.Id == id);
+
+        if (country is null)
+        {
+          return NotFound($"País com o id {id} não encontrado.");
+        }
+        else
+        {
+          country = _mapper.Map<Country>(countryDto);
+        }
+
         _context.CountryRepository.Update(country);
         _context.Commit();
       }
@@ -98,13 +123,14 @@ namespace MoviesCollection.Api.Controllers
         return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um problema ao tentar executar a sua solicitação.");
       }
 
-      return Ok(country);
+      return Ok();
     }
 
     [HttpDelete("{id:int:min(1)}")]
-    public ActionResult Delete(int id)
+    public ActionResult<CountryDTO> Delete(int id)
     {
       Country? country = new();
+      CountryDTO countryDTO = new();
 
       try
       {
@@ -130,7 +156,8 @@ namespace MoviesCollection.Api.Controllers
         return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um problema ao tentar executar a sua solicitação.");
       }
 
-      return Ok(country);
+      countryDTO = _mapper.Map<CountryDTO>(country);
+      return Ok(countryDTO);
     }
   }
 }

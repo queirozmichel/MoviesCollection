@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using MoviesCollection.Api.DTOs;
 using MoviesCollection.Api.Models;
 using MoviesCollection.Api.Repository;
 
@@ -9,16 +11,19 @@ namespace MoviesCollection.Api.Controllers
   public class DirectorsController : ControllerBase
   {
     private readonly IUnitOfWork _context;
+    private IMapper _mapper;
 
-    public DirectorsController(IUnitOfWork context)
+    public DirectorsController(IUnitOfWork context, IMapper mapper)
     {
       _context = context;
+      _mapper = mapper;
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<Director>> Get()
+    public ActionResult<IEnumerable<DirectorDTO>> Get()
     {
       List<Director>? directors = new();
+      List<DirectorDTO> directorsDTO = new();
 
       try
       {
@@ -33,13 +38,17 @@ namespace MoviesCollection.Api.Controllers
       {
         return NotFound("Diretores não encontrados.");
       }
-      return directors;
+
+      directorsDTO = _mapper.Map<List<DirectorDTO>>(directors);
+      return directorsDTO;
     }
 
     [HttpGet("{id:int:min(1)}", Name = "GetDirector")]
-    public ActionResult<Director> Get(int id)
+    public ActionResult<DirectorDTO> Get(int id)
     {
       Director? director = new();
+      DirectorDTO directorDTO = new();
+
       try
       {
         director = _context.DirectorRepository.GetById(x => x.Id == id);
@@ -53,12 +62,17 @@ namespace MoviesCollection.Api.Controllers
       {
         return NotFound($"Diretor com id {id} não encontrado.");
       }
-      return director;
+
+      directorDTO = _mapper.Map<DirectorDTO>(director);
+      return directorDTO;
     }
 
     [HttpPost]
-    public ActionResult Post(Director director)
+    public ActionResult Post(Director directorDto)
     {
+      Director director = _mapper.Map<Director>(directorDto);
+      DirectorDTO directorDTO = new();
+
       if (director is null)
       {
         return BadRequest();
@@ -74,19 +88,33 @@ namespace MoviesCollection.Api.Controllers
         return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um problema ao tentar executar a sua solicitação.");
       }
 
-      return new CreatedAtRouteResult("GetDirector", new { id = director.Id }, director);
+      directorDTO = _mapper.Map<DirectorDTO>(director);
+      return new CreatedAtRouteResult("GetDirector", new { id = director.Id }, directorDTO);
     }
 
     [HttpPut("{id:int:min(1)}")]
-    public ActionResult Put(int id, Director director)
+    public ActionResult Put(int id, DirectorDTO directorDto)
     {
-      if (id != director.Id)
+      Director director = new();
+
+      if (id != directorDto.Id)
       {
         return BadRequest("Os id's são diferentes.");
       }
 
       try
       {
+        director = _context.DirectorRepository.GetById(x => x.Id == id);
+
+        if (director is null)
+        {
+          return NotFound($"Diretor com id {id} não encontrado.");
+        }
+        else
+        {
+          director = _mapper.Map<Director>(directorDto);
+        }
+
         _context.DirectorRepository.Update(director);
         _context.Commit();
       }
@@ -95,13 +123,14 @@ namespace MoviesCollection.Api.Controllers
         return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um problema ao tentar executar a sua solicitação.");
       }
 
-      return Ok(director);
+      return Ok();
     }
 
     [HttpDelete("{id:int:min(1)}")]
-    public ActionResult Delete(int id)
+    public ActionResult<DirectorDTO> Delete(int id)
     {
       Director? director = new();
+      DirectorDTO directorDTO = new();
 
       try
       {
@@ -126,7 +155,9 @@ namespace MoviesCollection.Api.Controllers
       {
         return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um problema ao tentar executar a sua solicitação.");
       }
-      return Ok(director);
+
+      directorDTO = _mapper.Map<DirectorDTO>(director);
+      return Ok(directorDTO);
     }
   }
 }
