@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using MoviesCollection.Api.DTOs;
 using MoviesCollection.Api.Models;
+using MoviesCollection.Api.Pagination;
 using MoviesCollection.Api.Repository;
+using System.Text.Json;
 
 namespace MoviesCollection.Api.Controllers
 {
@@ -20,14 +22,14 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<DirectorDTO>> Get()
+    public ActionResult<IEnumerable<DirectorDTO>> Get([FromQuery] DirectorsParameters directorsParameters)
     {
-      List<Director>? directors = new();
+      PagedList<Director>? directors = new();
       List<DirectorDTO> directorsDTO = new();
 
       try
       {
-        directors = _context.DirectorRepository.Get().ToList();
+        directors = _context.DirectorRepository.GetDirectors(directorsParameters);
       }
       catch (Exception)
       {
@@ -39,6 +41,17 @@ namespace MoviesCollection.Api.Controllers
         return NotFound("Diretores não encontrados.");
       }
 
+      var metadata = new
+      {
+        directors.TotalCount,
+        directors.PageSize,
+        directors.CurrentPage,
+        directors.TotalPages,
+        directors.HasNext,
+        directors.HasPrevious
+      };
+
+      Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(metadata));
       directorsDTO = _mapper.Map<List<DirectorDTO>>(directors);
       return directorsDTO;
     }

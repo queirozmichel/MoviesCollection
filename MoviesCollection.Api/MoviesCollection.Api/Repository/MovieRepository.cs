@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MoviesCollection.Api.Context;
 using MoviesCollection.Api.Models;
+using MoviesCollection.Api.Pagination;
 
 namespace MoviesCollection.Api.Repository
 {
@@ -10,10 +11,9 @@ namespace MoviesCollection.Api.Repository
     {
     }
 
-    IEnumerable<Movie> IMovieRepository.Get()
+    public PagedList<Movie> Get(MoviesParameters moviesParameters)
     {
-      return _context.Movies.AsNoTracking().Include(g => g.Genre).Include(d => d.Director).Include(c => c.Country)
-        .Include(l => l.Language).Include(p => p.ParentalRating);
+      return PagedList<Movie>.ToPagedList(Get().OrderBy(x => x.Title), moviesParameters.PageNumber, moviesParameters.PageSize);
     }
   }
 }

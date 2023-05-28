@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using MoviesCollection.Api.DTOs;
 using MoviesCollection.Api.Models;
+using MoviesCollection.Api.Pagination;
 using MoviesCollection.Api.Repository;
+using System.Text.Json;
 
 namespace MoviesCollection.Api.Controllers
 {
@@ -20,14 +22,14 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<LanguageDTO>> Get()
+    public ActionResult<IEnumerable<LanguageDTO>> Get([FromQuery] LanguageParameters languageParameters)
     {
-      List<Language> languages = new();
+      PagedList<Language> languages = new();
       List<LanguageDTO> languagesDTO = new();
 
       try
       {
-        languages = _context.LanguageRepository.Get().ToList();
+        languages = _context.LanguageRepository.GetLanguages(languageParameters);
       }
       catch (Exception)
       {
@@ -39,6 +41,17 @@ namespace MoviesCollection.Api.Controllers
         return NotFound("Idiomas não encontrados.");
       }
 
+      var metadata = new
+      {
+        languages.TotalCount,
+        languages.PageSize,
+        languages.CurrentPage,
+        languages.TotalPages,
+        languages.HasNext,
+        languages.HasPrevious
+      };
+
+      Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(metadata));
       languagesDTO = _mapper.Map<List<LanguageDTO>>(languages);
       return languagesDTO;
     }

@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using MoviesCollection.Api.DTOs;
 using MoviesCollection.Api.Models;
+using MoviesCollection.Api.Pagination;
 using MoviesCollection.Api.Repository;
+using System.Text.Json;
 
 namespace MoviesCollection.Api.Controllers
 {
@@ -20,14 +22,14 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<GenreDTO>> Get()
+    public ActionResult<IEnumerable<GenreDTO>> Get([FromQuery] GenresParameters genresParameters)
     {
-      List<Genre> genres = new();
+      PagedList<Genre> genres = new();
       List<GenreDTO> genresDTO = new();
 
       try
       {
-        genres = _context.GenreRepository.Get().ToList();
+        genres = _context.GenreRepository.GetGenres(genresParameters);
       }
       catch (Exception)
       {
@@ -39,6 +41,17 @@ namespace MoviesCollection.Api.Controllers
         return NotFound("Gêneros não encontrados.");
       }
 
+      var metadata = new
+      {
+        genres.TotalCount,
+        genres.PageSize,
+        genres.CurrentPage,
+        genres.TotalPages,
+        genres.HasNext,
+        genres.HasPrevious
+      };
+
+      Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(metadata));
       genresDTO = _mapper.Map<List<GenreDTO>>(genres);
       return genresDTO;
     }

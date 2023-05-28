@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using MoviesCollection.Api.DTOs;
 using MoviesCollection.Api.Models;
+using MoviesCollection.Api.Pagination;
 using MoviesCollection.Api.Repository;
+using System.Text.Json;
 
 namespace MoviesCollection.Api.Controllers
 {
@@ -20,14 +22,14 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<CountryDTO>> Get()
+    public ActionResult<IEnumerable<CountryDTO>> Get([FromQuery] CountriesParameters countriesParameters)
     {
-      List<Country> countries = new();
+      PagedList<Country> countries = new();
       List<CountryDTO> countriesDTO = new();
 
       try
       {
-        countries = _context.CountryRepository.Get().ToList();
+        countries = _context.CountryRepository.GetCountries(countriesParameters);
       }
       catch (Exception)
       {
@@ -39,6 +41,17 @@ namespace MoviesCollection.Api.Controllers
         return NotFound("Países não foram encontrados.");
       }
 
+      var metadata = new
+      {
+        countries.TotalCount,
+        countries.PageSize,
+        countries.CurrentPage,
+        countries.TotalPages,
+        countries.HasNext,
+        countries.HasPrevious
+      };
+
+      Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(metadata));
       countriesDTO = _mapper.Map<List<CountryDTO>>(countries);
       return countriesDTO;
     }

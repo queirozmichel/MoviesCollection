@@ -1,9 +1,10 @@
 ﻿using MoviesCollection.Api.Models;
+using MoviesCollection.Api.Pagination;
 
 namespace MoviesCollection.Api.Repository
 {
   public interface IMovieRepository : IRepository<Movie>
   {
-    new IEnumerable<Movie> Get();
+    PagedList<Movie> Get(MoviesParameters moviesParameters);
   }
 }

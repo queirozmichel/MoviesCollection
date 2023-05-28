@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using MoviesCollection.Api.DTOs;
 using MoviesCollection.Api.Models;
+using MoviesCollection.Api.Pagination;
 using MoviesCollection.Api.Repository;
+using System.Text.Json;
 
 namespace MoviesCollection.Api.Controllers
 {
@@ -20,14 +22,14 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<ParentalRatingDTO>> Get()
+    public ActionResult<IEnumerable<ParentalRatingDTO>> Get([FromQuery]ParentalRatingsParameters parentalRatingsParameters)
     {
-      List<ParentalRating> parentalRatings = new();
+      PagedList<ParentalRating> parentalRatings = new();
       List<ParentalRatingDTO> parentalRatingsDTO = new();
 
       try
       {
-        parentalRatings = _context.ParentalRatingRepository.Get().ToList();
+        parentalRatings = _context.ParentalRatingRepository.GetParentalRatings(parentalRatingsParameters);
       }
       catch (Exception)
       {
@@ -39,6 +41,17 @@ namespace MoviesCollection.Api.Controllers
         return NotFound("Classificações indicativas não encontradas");
       }
 
+      var metadata = new
+      {
+        parentalRatings.TotalCount,
+        parentalRatings.PageSize,
+        parentalRatings.CurrentPage,
+        parentalRatings.TotalPages,
+        parentalRatings.HasNext,
+        parentalRatings.HasPrevious
+      };
+
+      Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(metadata));
       parentalRatingsDTO = _mapper.Map<List<ParentalRatingDTO>>(parentalRatings);
       return parentalRatingsDTO;
     }
