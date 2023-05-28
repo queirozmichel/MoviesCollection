@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MoviesCollection.Api.Context;
 using MoviesCollection.Api.DTOs.Mappings;
@@ -14,6 +15,7 @@ string? mySqlServerConnection = builder.Configuration.GetConnectionString("Defau
 builder.Services.AddScoped<IUnitOfWork, UnityOfWork>(); //Unity Of Work
 builder.Services.AddSingleton(mapper); //AutoMapper
 builder.Services.AddDbContext<ApiDbContext>(options => options.UseSqlServer(mySqlServerConnection));
+builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ApiDbContext>().AddDefaultTokenProviders();
 builder.Services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -29,6 +31,9 @@ if (app.Environment.IsDevelopment())
 
 // Adiciona um middleware para redirecionar para https
 app.UseHttpsRedirection();
+
+//Adiciona o middleware que habilita a autenticação
+app.UseAuthentication();
 
 //Adiciona o middleware que habilita a autorização
 app.UseAuthorization();

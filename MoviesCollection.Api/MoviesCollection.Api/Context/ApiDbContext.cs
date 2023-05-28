@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MoviesCollection.Api.Models;
 
 namespace MoviesCollection.Api.Context
 {
-  public class ApiDbContext : DbContext
+  public class ApiDbContext : IdentityDbContext
   {
     public ApiDbContext(DbContextOptions<ApiDbContext> options) : base(options) { }
 
