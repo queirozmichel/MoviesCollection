@@ -11,9 +11,9 @@ namespace MoviesCollection.Api.Repository
     {
     }
 
-    public PagedList<Movie> Get(MoviesParameters moviesParameters)
+    public async Task<PagedList<Movie>> Get(MoviesParameters moviesParameters)
     {
-      return PagedList<Movie>.ToPagedList(Get().OrderBy(x => x.Title), moviesParameters.PageNumber, moviesParameters.PageSize);
+      return await PagedList<Movie>.ToPagedList(Get().OrderBy(x => x.Title), moviesParameters.PageNumber, moviesParameters.PageSize);
     }
   }
 }

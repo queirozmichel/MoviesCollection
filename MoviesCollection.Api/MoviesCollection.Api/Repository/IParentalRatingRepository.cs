@@ -5,6 +5,6 @@ namespace MoviesCollection.Api.Repository
 {
   public interface IParentalRatingRepository : IRepository<ParentalRating>
   {
-    PagedList<ParentalRating> GetParentalRatings(ParentalRatingsParameters parentalRatingsParameters);
+    Task<PagedList<ParentalRating>> GetParentalRatings(ParentalRatingsParameters parentalRatingsParameters);
   }
 }

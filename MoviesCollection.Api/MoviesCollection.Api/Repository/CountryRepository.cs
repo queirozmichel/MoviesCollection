@@ -10,9 +10,9 @@ namespace MoviesCollection.Api.Repository
     {
     }
 
-    public PagedList<Country> GetCountries(CountriesParameters countriesParameters)
+    public async Task<PagedList<Country>> GetCountries(CountriesParameters countriesParameters)
     {
-      return PagedList<Country>.ToPagedList(Get().OrderBy(x => x.Name), countriesParameters.PageNumber, countriesParameters.PageSize);
+      return await PagedList<Country>.ToPagedList(Get().OrderBy(x => x.Name), countriesParameters.PageNumber, countriesParameters.PageSize);
     }
   }
 }

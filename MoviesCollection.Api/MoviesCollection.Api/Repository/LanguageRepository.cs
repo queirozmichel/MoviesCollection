@@ -10,9 +10,9 @@ namespace MoviesCollection.Api.Repository
     {
     }
 
-    public PagedList<Language> GetLanguages(LanguageParameters languageParameters)
+    public async Task<PagedList<Language>> GetLanguages(LanguageParameters languageParameters)
     {
-      return PagedList<Language>.ToPagedList(Get().OrderBy(x => x.Description), languageParameters.PageNumber, languageParameters.PageSize);
+      return await PagedList<Language>.ToPagedList(Get().OrderBy(x => x.Description), languageParameters.PageNumber, languageParameters.PageSize);
     }
   }
 }

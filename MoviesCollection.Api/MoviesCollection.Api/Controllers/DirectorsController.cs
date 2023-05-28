@@ -22,14 +22,14 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<DirectorDTO>> Get([FromQuery] DirectorsParameters directorsParameters)
+    public async Task<ActionResult<IEnumerable<DirectorDTO>>> Get([FromQuery] DirectorsParameters directorsParameters)
     {
       PagedList<Director>? directors = new();
       List<DirectorDTO> directorsDTO = new();
 
       try
       {
-        directors = _context.DirectorRepository.GetDirectors(directorsParameters);
+        directors = await _context.DirectorRepository.GetDirectors(directorsParameters);
       }
       catch (Exception)
       {
@@ -57,14 +57,14 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpGet("{id:int:min(1)}", Name = "GetDirector")]
-    public ActionResult<DirectorDTO> Get(int id)
+    public async Task<ActionResult<DirectorDTO>> Get(int id)
     {
       Director? director = new();
       DirectorDTO directorDTO = new();
 
       try
       {
-        director = _context.DirectorRepository.GetById(x => x.Id == id);
+        director = await _context.DirectorRepository.GetById(x => x.Id == id);
       }
       catch (Exception)
       {
@@ -106,7 +106,7 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpPut("{id:int:min(1)}")]
-    public ActionResult Put(int id, DirectorDTO directorDto)
+    public async Task<ActionResult> Put(int id, DirectorDTO directorDto)
     {
       Director director = new();
 
@@ -117,7 +117,7 @@ namespace MoviesCollection.Api.Controllers
 
       try
       {
-        director = _context.DirectorRepository.GetById(x => x.Id == id);
+        director = await _context.DirectorRepository.GetById(x => x.Id == id);
 
         if (director is null)
         {
@@ -140,14 +140,14 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpDelete("{id:int:min(1)}")]
-    public ActionResult<DirectorDTO> Delete(int id)
+    public async Task<ActionResult<DirectorDTO>> Delete(int id)
     {
       Director? director = new();
       DirectorDTO directorDTO = new();
 
       try
       {
-        director = _context.DirectorRepository.GetById(director => director.Id == id);
+        director = await _context.DirectorRepository.GetById(director => director.Id == id);
       }
       catch (Exception)
       {

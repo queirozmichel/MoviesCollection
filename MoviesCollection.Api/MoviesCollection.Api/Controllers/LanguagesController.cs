@@ -22,14 +22,14 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<LanguageDTO>> Get([FromQuery] LanguageParameters languageParameters)
+    public async Task<ActionResult<IEnumerable<LanguageDTO>>> Get([FromQuery] LanguageParameters languageParameters)
     {
       PagedList<Language> languages = new();
       List<LanguageDTO> languagesDTO = new();
 
       try
       {
-        languages = _context.LanguageRepository.GetLanguages(languageParameters);
+        languages = await _context.LanguageRepository.GetLanguages(languageParameters);
       }
       catch (Exception)
       {
@@ -57,14 +57,14 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpGet("{id:int:min(1)}", Name = "GetLanguage")]
-    public ActionResult<LanguageDTO> Get(int id)
+    public async Task<ActionResult<LanguageDTO>> Get(int id)
     {
       Language? language = new();
       LanguageDTO languageDTO = new();
 
       try
       {
-        language = _context.LanguageRepository.GetById(language => language.Id == id);
+        language = await _context.LanguageRepository.GetById(language => language.Id == id);
       }
       catch (Exception)
       {
@@ -106,7 +106,7 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpPut("{id:int:min(1)}")]
-    public ActionResult Put(int id, LanguageDTO languageDto)
+    public async Task<ActionResult> Put(int id, LanguageDTO languageDto)
     {
       Language language = new();
 
@@ -117,7 +117,7 @@ namespace MoviesCollection.Api.Controllers
 
       try
       {
-        language = _context.LanguageRepository.GetById(x => x.Id == id);
+        language = await _context.LanguageRepository.GetById(x => x.Id == id);
 
         if (language is null)
         {
@@ -140,14 +140,14 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpDelete("{id:int:min(1)}")]
-    public ActionResult<LanguageDTO> Delete(int id)
+    public async Task<ActionResult<LanguageDTO>> Delete(int id)
     {
       Language? language = new();
       LanguageDTO languageDTO= new();
 
       try
       {
-        language = _context.LanguageRepository.GetById(language => language.Id == id);
+        language = await _context.LanguageRepository.GetById(language => language.Id == id);
       }
       catch (Exception)
       {

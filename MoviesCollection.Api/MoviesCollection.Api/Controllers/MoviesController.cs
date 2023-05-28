@@ -22,14 +22,14 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<MovieDTO>> Get([FromQuery] MoviesParameters moviesParameters)
+    public async Task<ActionResult<IEnumerable<MovieDTO>>> Get([FromQuery] MoviesParameters moviesParameters)
     {
       PagedList<Movie> movies = new();
       List<MovieDTO> moviesDTO = new();
 
       try
       {
-        movies = _context.MovieRepository.Get(moviesParameters);
+        movies = await _context.MovieRepository.Get(moviesParameters);
       }
       catch (Exception)
       {
@@ -57,14 +57,14 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpGet("{id:int:min(1)}", Name = "GetMovie")]
-    public ActionResult<MovieDTO> Get(int id)
+    public async Task<ActionResult<MovieDTO>> Get(int id)
     {
       Movie? movie = new();
       MovieDTO movieDTO = new();
 
       try
       {
-        movie = _context.MovieRepository.GetById(movie => movie.Id == id);
+        movie = await _context.MovieRepository.GetById(movie => movie.Id == id);
       }
       catch (Exception)
       {
@@ -106,7 +106,7 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpPut("{id:int:min(1)}")]
-    public ActionResult Put(int id, MovieDTO movieDto)
+    public async Task<ActionResult> Put(int id, MovieDTO movieDto)
     {
       Movie movie = new();
 
@@ -117,7 +117,7 @@ namespace MoviesCollection.Api.Controllers
 
       try
       {
-        movie = _context.MovieRepository.GetById(x => x.Id == id);
+        movie = await _context.MovieRepository.GetById(x => x.Id == id);
 
         if (movie is null)
         {
@@ -140,14 +140,14 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpDelete("{id:int:min(1)}")]
-    public ActionResult<MovieDTO> Delete(int id)
+    public async Task<ActionResult<MovieDTO>> Delete(int id)
     {
       Movie? movie = new();
       MovieDTO movieDTO = new();
 
       try
       {
-        movie = _context.MovieRepository.GetById(_movie => _movie.Id == id);
+        movie = await _context.MovieRepository.GetById(_movie => _movie.Id == id);
       }
       catch (Exception)
       {

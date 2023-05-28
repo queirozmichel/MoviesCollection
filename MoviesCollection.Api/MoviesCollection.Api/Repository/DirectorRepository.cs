@@ -10,9 +10,9 @@ namespace MoviesCollection.Api.Repository
     {
     }
 
-    public PagedList<Director> GetDirectors(DirectorsParameters directorsParameters)
+    public async Task<PagedList<Director>> GetDirectors(DirectorsParameters directorsParameters)
     {
-      return PagedList<Director>.ToPagedList(Get().OrderBy(x => x.Name), directorsParameters.PageNumber, directorsParameters.PageSize);
+      return await PagedList<Director>.ToPagedList(Get().OrderBy(x => x.Name), directorsParameters.PageNumber, directorsParameters.PageSize);
     }
   }
 }

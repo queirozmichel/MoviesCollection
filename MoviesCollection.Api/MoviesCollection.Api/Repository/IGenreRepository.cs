@@ -5,6 +5,6 @@ namespace MoviesCollection.Api.Repository
 {
   public interface IGenreRepository : IRepository<Genre>
   {
-    PagedList<Genre> GetGenres(GenresParameters genresParameters);
+    Task<PagedList<Genre>> GetGenres(GenresParameters genresParameters);
   }
 }

@@ -5,6 +5,6 @@ namespace MoviesCollection.Api.Repository
 {
   public interface ICountryRepository : IRepository<Country>
   {
-    PagedList<Country> GetCountries(CountriesParameters countriesParameters);
+    Task<PagedList<Country>> GetCountries(CountriesParameters countriesParameters);
   }
 }

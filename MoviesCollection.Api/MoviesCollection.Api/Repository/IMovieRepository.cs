@@ -5,6 +5,6 @@ namespace MoviesCollection.Api.Repository
 {
   public interface IMovieRepository : IRepository<Movie>
   {
-    PagedList<Movie> Get(MoviesParameters moviesParameters);
+    Task<PagedList<Movie>> Get(MoviesParameters moviesParameters);
   }
 }

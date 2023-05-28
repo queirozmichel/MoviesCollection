@@ -5,6 +5,6 @@ namespace MoviesCollection.Api.Repository
 {
   public interface ILanguageRepository : IRepository<Language>
   {
-    PagedList<Language> GetLanguages(LanguageParameters languageParameters);
+    Task<PagedList<Language>> GetLanguages(LanguageParameters languageParameters);
   }
 }

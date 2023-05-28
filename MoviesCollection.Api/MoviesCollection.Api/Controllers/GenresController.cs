@@ -22,14 +22,14 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<GenreDTO>> Get([FromQuery] GenresParameters genresParameters)
+    public async Task<ActionResult<IEnumerable<GenreDTO>>> Get([FromQuery] GenresParameters genresParameters)
     {
       PagedList<Genre> genres = new();
       List<GenreDTO> genresDTO = new();
 
       try
       {
-        genres = _context.GenreRepository.GetGenres(genresParameters);
+        genres = await _context.GenreRepository.GetGenres(genresParameters);
       }
       catch (Exception)
       {
@@ -57,13 +57,13 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpGet("{id:int:min(1)}", Name = "GetGenre")]
-    public ActionResult<GenreDTO> Get(int id)
+    public async Task<ActionResult<GenreDTO>> Get(int id)
     {
       Genre? genre = new();
       GenreDTO genreDTO = new();
       try
       {
-        genre = _context.GenreRepository.GetById(genre => genre.Id == id);
+        genre = await _context.GenreRepository.GetById(genre => genre.Id == id);
       }
       catch (Exception)
       {
@@ -105,7 +105,7 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpPut("{id:int:min(1)}")]
-    public ActionResult Put(int id, Genre genreDto)
+    public async Task<ActionResult> Put(int id, Genre genreDto)
     {
       Genre genre = new();
 
@@ -116,7 +116,7 @@ namespace MoviesCollection.Api.Controllers
 
       try
       {
-        genre = _context.GenreRepository.GetById(x => x.Id == id);
+        genre = await _context.GenreRepository.GetById(x => x.Id == id);
 
         if (genre is null)
         {
@@ -139,14 +139,14 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpDelete("{id:int:min(1)}")]
-    public ActionResult<GenreDTO> Delete(int id)
+    public async Task<ActionResult<GenreDTO>> Delete(int id)
     {
       Genre? genre = new();
       GenreDTO genreDTO = new();
 
       try
       {
-        genre = _context.GenreRepository.GetById(genre => genre.Id == id);
+        genre = await _context.GenreRepository.GetById(genre => genre.Id == id);
       }
       catch (Exception)
       {

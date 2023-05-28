@@ -9,6 +9,6 @@
     ICountryRepository CountryRepository { get; }
     IParentalRatingRepository ParentalRatingRepository { get; }
 
-    void Commit();
+    Task Commit();
   }
 }

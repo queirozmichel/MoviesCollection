@@ -22,14 +22,14 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<ParentalRatingDTO>> Get([FromQuery]ParentalRatingsParameters parentalRatingsParameters)
+    public async Task<ActionResult<IEnumerable<ParentalRatingDTO>>> Get([FromQuery] ParentalRatingsParameters parentalRatingsParameters)
     {
       PagedList<ParentalRating> parentalRatings = new();
       List<ParentalRatingDTO> parentalRatingsDTO = new();
 
       try
       {
-        parentalRatings = _context.ParentalRatingRepository.GetParentalRatings(parentalRatingsParameters);
+        parentalRatings = await _context.ParentalRatingRepository.GetParentalRatings(parentalRatingsParameters);
       }
       catch (Exception)
       {
@@ -57,14 +57,14 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpGet("{id:int:min(1)}", Name = "GetParentalRating")]
-    public ActionResult<ParentalRatingDTO> Get(int id)
+    public async Task<ActionResult<ParentalRatingDTO>> Get(int id)
     {
       ParentalRating? parentalRating = new();
       ParentalRatingDTO parentalRatingDTO = new();
 
       try
       {
-        parentalRating = _context.ParentalRatingRepository.GetById(parentalRating => parentalRating.Id == id);
+        parentalRating = await _context.ParentalRatingRepository.GetById(parentalRating => parentalRating.Id == id);
       }
       catch (Exception)
       {
@@ -105,7 +105,7 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpPut("{id:int:min(1)}")]
-    public ActionResult Put(int id, ParentalRatingDTO parentalRatingDto)
+    public async Task<ActionResult> Put(int id, ParentalRatingDTO parentalRatingDto)
     {
       ParentalRating parentalRating = new();
 
@@ -116,7 +116,7 @@ namespace MoviesCollection.Api.Controllers
 
       try
       {
-        parentalRating = _context.ParentalRatingRepository.GetById(x => x.Id == id);
+        parentalRating = await _context.ParentalRatingRepository.GetById(x => x.Id == id);
 
         if (parentalRating is null)
         {
@@ -138,14 +138,14 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpDelete("{id:int:min(1)}")]
-    public ActionResult<ParentalRatingDTO> Delete(int id)
+    public async Task<ActionResult<ParentalRatingDTO>> Delete(int id)
     {
       ParentalRating? parentalRating = new();
       ParentalRatingDTO parentalRatingDTO = new();
 
       try
       {
-        parentalRating = _context.ParentalRatingRepository.GetById(parentalRating => parentalRating.Id == id);
+        parentalRating = await _context.ParentalRatingRepository.GetById(parentalRating => parentalRating.Id == id);
       }
       catch (Exception)
       {

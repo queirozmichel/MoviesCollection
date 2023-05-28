@@ -10,9 +10,9 @@ namespace MoviesCollection.Api.Repository
     {
     }
 
-    public PagedList<ParentalRating> GetParentalRatings(ParentalRatingsParameters parentalRatingsParameters)
+    public async Task<PagedList<ParentalRating>> GetParentalRatings(ParentalRatingsParameters parentalRatingsParameters)
     {
-      return PagedList<ParentalRating>.ToPagedList(Get().OrderBy(x => x.Description), parentalRatingsParameters.PageNumber, parentalRatingsParameters.PageSize);
+      return await PagedList<ParentalRating>.ToPagedList(Get().OrderBy(x => x.Description), parentalRatingsParameters.PageNumber, parentalRatingsParameters.PageSize);
     }
   }
 }

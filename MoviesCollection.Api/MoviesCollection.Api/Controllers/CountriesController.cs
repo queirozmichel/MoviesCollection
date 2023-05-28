@@ -22,14 +22,14 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<CountryDTO>> Get([FromQuery] CountriesParameters countriesParameters)
+    public async Task<ActionResult<IEnumerable<CountryDTO>>> Get([FromQuery] CountriesParameters countriesParameters)
     {
       PagedList<Country> countries = new();
       List<CountryDTO> countriesDTO = new();
 
       try
       {
-        countries = _context.CountryRepository.GetCountries(countriesParameters);
+        countries = await _context.CountryRepository.GetCountries(countriesParameters);
       }
       catch (Exception)
       {
@@ -57,14 +57,14 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpGet("{id:int:min(1)}", Name = "GetCountry")]
-    public ActionResult<CountryDTO> Get(int id)
+    public async Task<ActionResult<CountryDTO>> Get(int id)
     {
       Country? country = new();
       CountryDTO? countryDTO = new();
 
       try
       {
-        country = _context.CountryRepository.GetById(country => country.Id == id);
+        country = await _context.CountryRepository.GetById(country => country.Id == id);
       }
       catch (Exception)
       {
@@ -106,7 +106,7 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpPut("{id:int:min(1)}")]
-    public ActionResult Put(int id, CountryDTO countryDto)
+    public async Task<ActionResult> Put(int id, CountryDTO countryDto)
     {
       Country country = new();
 
@@ -117,7 +117,7 @@ namespace MoviesCollection.Api.Controllers
 
       try
       {
-        country = _context.CountryRepository.GetById(x => x.Id == id);
+        country = await _context.CountryRepository.GetById(x => x.Id == id);
 
         if (country is null)
         {
@@ -140,14 +140,14 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpDelete("{id:int:min(1)}")]
-    public ActionResult<CountryDTO> Delete(int id)
+    public async Task<ActionResult<CountryDTO>> Delete(int id)
     {
       Country? country = new();
       CountryDTO countryDTO = new();
 
       try
       {
-        country = _context.CountryRepository.GetById(country => country.Id == id);
+        country = await _context.CountryRepository.GetById(country => country.Id == id);
       }
       catch (Exception)
       {

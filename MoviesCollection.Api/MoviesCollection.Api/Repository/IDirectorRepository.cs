@@ -5,6 +5,6 @@ namespace MoviesCollection.Api.Repository
 {
   public interface IDirectorRepository : IRepository<Director>
   {
-    PagedList<Director> GetDirectors(DirectorsParameters directorsParameters);
+    Task<PagedList<Director>> GetDirectors(DirectorsParameters directorsParameters);
   }
 }
