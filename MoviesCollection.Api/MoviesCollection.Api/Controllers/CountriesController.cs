@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MoviesCollection.Api.DTOs;
 using MoviesCollection.Api.Models;
@@ -8,6 +10,7 @@ using System.Text.Json;
 
 namespace MoviesCollection.Api.Controllers
 {
+  [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
   [Route("api/countries")]
   [ApiController]
   public class CountriesController : ControllerBase
@@ -81,7 +84,7 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpPost]
-    public ActionResult Post(CountryDTO countryDto)
+    public async Task<ActionResult> Post(CountryDTO countryDto)
     {
       Country country = _mapper.Map<Country>(countryDto);
       CountryDTO countryDTO = new();
@@ -94,7 +97,7 @@ namespace MoviesCollection.Api.Controllers
       try
       {
         _context.CountryRepository.Add(country);
-        _context.Commit();
+        await _context.Commit();
       }
       catch (Exception)
       {
@@ -129,7 +132,7 @@ namespace MoviesCollection.Api.Controllers
         }
 
         _context.CountryRepository.Update(country);
-        _context.Commit();
+        await _context.Commit();
       }
       catch (Exception)
       {
@@ -162,7 +165,7 @@ namespace MoviesCollection.Api.Controllers
       try
       {
         _context.CountryRepository.Delete(country);
-        _context.Commit();
+        await _context.Commit();
       }
       catch (Exception)
       {

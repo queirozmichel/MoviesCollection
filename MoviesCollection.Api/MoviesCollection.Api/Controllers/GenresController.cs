@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MoviesCollection.Api.DTOs;
 using MoviesCollection.Api.Models;
@@ -8,6 +10,7 @@ using System.Text.Json;
 
 namespace MoviesCollection.Api.Controllers
 {
+  [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
   [Route("api/genres")]
   [ApiController]
   public class GenresController : ControllerBase
@@ -80,7 +83,7 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpPost]
-    public ActionResult Post(GenreDTO genreDto)
+    public async Task<ActionResult> Post(GenreDTO genreDto)
     {
       Genre genre = _mapper.Map<Genre>(genreDto);
       GenreDTO genreDTO = new();
@@ -93,7 +96,7 @@ namespace MoviesCollection.Api.Controllers
       try
       {
         _context.GenreRepository.Add(genre);
-        _context.Commit();
+        await _context.Commit();
       }
       catch (Exception)
       {
@@ -128,7 +131,7 @@ namespace MoviesCollection.Api.Controllers
         }
 
         _context.GenreRepository.Update(genre);
-        _context.Commit();
+        await _context.Commit();
       }
       catch (Exception)
       {
@@ -161,7 +164,7 @@ namespace MoviesCollection.Api.Controllers
       try
       {
         _context.GenreRepository.Delete(genre);
-        _context.Commit();
+        await _context.Commit();
       }
       catch (Exception)
       {

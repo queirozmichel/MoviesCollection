@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MoviesCollection.Api.DTOs;
 using MoviesCollection.Api.Models;
@@ -8,6 +10,7 @@ using System.Text.Json;
 
 namespace MoviesCollection.Api.Controllers
 {
+  [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
   [Route("api/directors")]
   [ApiController]
   public class DirectorsController : ControllerBase
@@ -81,7 +84,7 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpPost]
-    public ActionResult Post(Director directorDto)
+    public async Task<ActionResult> Post(Director directorDto)
     {
       Director director = _mapper.Map<Director>(directorDto);
       DirectorDTO directorDTO = new();
@@ -94,7 +97,7 @@ namespace MoviesCollection.Api.Controllers
       try
       {
         _context.DirectorRepository.Add(director);
-        _context.Commit();
+        await _context.Commit();
       }
       catch (Exception)
       {
@@ -129,7 +132,7 @@ namespace MoviesCollection.Api.Controllers
         }
 
         _context.DirectorRepository.Update(director);
-        _context.Commit();
+        await _context.Commit();
       }
       catch (Exception)
       {
@@ -162,7 +165,7 @@ namespace MoviesCollection.Api.Controllers
       try
       {
         _context.DirectorRepository.Delete(director);
-        _context.Commit();
+        await _context.Commit();
       }
       catch (Exception)
       {

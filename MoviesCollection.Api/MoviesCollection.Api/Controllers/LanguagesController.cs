@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MoviesCollection.Api.DTOs;
 using MoviesCollection.Api.Models;
@@ -8,6 +10,7 @@ using System.Text.Json;
 
 namespace MoviesCollection.Api.Controllers
 {
+  [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
   [Route("api/languages")]
   [ApiController]
   public class LanguagesController : ControllerBase
@@ -81,7 +84,7 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpPost]
-    public ActionResult Post(LanguageDTO languageDto)
+    public async Task<ActionResult> Post(LanguageDTO languageDto)
     {
       Language language = _mapper.Map<Language>(languageDto);
       LanguageDTO languageDTO = new();
@@ -94,7 +97,7 @@ namespace MoviesCollection.Api.Controllers
       try
       {
         _context.LanguageRepository.Add(language);
-        _context.Commit();
+        await _context.Commit();
       }
       catch (Exception)
       {
@@ -129,7 +132,7 @@ namespace MoviesCollection.Api.Controllers
         }
 
         _context.LanguageRepository.Update(language);
-        _context.Commit();
+        await _context.Commit();
       }
       catch (Exception)
       {
@@ -143,7 +146,7 @@ namespace MoviesCollection.Api.Controllers
     public async Task<ActionResult<LanguageDTO>> Delete(int id)
     {
       Language? language = new();
-      LanguageDTO languageDTO= new();
+      LanguageDTO languageDTO = new();
 
       try
       {
@@ -162,7 +165,7 @@ namespace MoviesCollection.Api.Controllers
       try
       {
         _context.LanguageRepository.Delete(language);
-        _context.Commit();
+        await _context.Commit();
       }
       catch (Exception)
       {

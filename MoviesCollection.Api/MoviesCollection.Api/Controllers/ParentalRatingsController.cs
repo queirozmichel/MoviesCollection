@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MoviesCollection.Api.DTOs;
 using MoviesCollection.Api.Models;
@@ -8,6 +10,7 @@ using System.Text.Json;
 
 namespace MoviesCollection.Api.Controllers
 {
+  [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
   [Route("api/parentalratings")]
   [ApiController]
   public class ParentalRatingsController : ControllerBase
@@ -81,7 +84,7 @@ namespace MoviesCollection.Api.Controllers
     }
 
     [HttpPost]
-    public ActionResult Post(ParentalRatingDTO parentalRatingDto)
+    public async Task<ActionResult> Post(ParentalRatingDTO parentalRatingDto)
     {
       ParentalRating parentalRating = _mapper.Map<ParentalRating>(parentalRatingDto);
       ParentalRatingDTO parentalRatingDTO = new();
@@ -93,7 +96,7 @@ namespace MoviesCollection.Api.Controllers
       try
       {
         _context.ParentalRatingRepository.Add(parentalRating);
-        _context.Commit();
+        await _context.Commit();
       }
       catch (Exception)
       {
@@ -128,7 +131,7 @@ namespace MoviesCollection.Api.Controllers
         }
 
         _context.ParentalRatingRepository.Update(parentalRating);
-        _context.Commit();
+        await _context.Commit();
       }
       catch (Exception)
       {
@@ -160,7 +163,7 @@ namespace MoviesCollection.Api.Controllers
       try
       {
         _context.ParentalRatingRepository.Delete(parentalRating);
-        _context.Commit();
+        await _context.Commit();
       }
       catch (Exception)
       {
