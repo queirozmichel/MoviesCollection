@@ -2,7 +2,6 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MoviesCollection.Api.Context;
@@ -18,6 +17,7 @@ IMapper mapper = mappingConfig.CreateMapper(); //AutoMapper
 
 // Add services to the container.
 string? mySqlServerConnection = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddCors(); // Adicionar Cors
 builder.Services.AddScoped<IUnitOfWork, UnityOfWork>(); //Unity Of Work
 builder.Services.AddSingleton(mapper); //AutoMapper
 builder.Services.AddDbContext<ApiDbContext>(options => options.UseSqlServer(mySqlServerConnection));
@@ -68,7 +68,6 @@ builder.Services.AddSwaggerGen(x =>
       new string[]{}
     }
   });
-
 });
 
 var app = builder.Build();
@@ -80,13 +79,13 @@ if (app.Environment.IsDevelopment())
   app.UseSwaggerUI();
 }
 
-// Adiciona um middleware para redirecionar para https
+//Habilita um middleware para redirecionar para https
 app.UseHttpsRedirection();
-
-//Adiciona o middleware que habilita a autenticação
+//Habilita o middleware responsável por permitir as requisições de outras origens
+app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+//Habilita o middleware que responsável pela autenticação
 app.UseAuthentication();
-
-//Adiciona o middleware que habilita a autorização
+//Habilita o middleware responsável pela autorização
 app.UseAuthorization();
 
 app.MapControllers();
