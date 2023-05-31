@@ -11,6 +11,8 @@ using System.Text.Json;
 namespace MoviesCollection.Api.Controllers
 {
   [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+  [ApiConventionType(typeof(DefaultApiConventions))]
+  [Produces("application/json")]
   [Route("api/movies")]
   [ApiController]
   public class MoviesController : ControllerBase
@@ -24,6 +26,9 @@ namespace MoviesCollection.Api.Controllers
       _mapper = mapper;
     }
 
+    /// <summary>
+    /// Obtém todos os filmes
+    /// </summary>
     [HttpGet]
     public async Task<ActionResult<IEnumerable<MovieDTO>>> Get([FromQuery] MoviesParameters moviesParameters)
     {
@@ -59,6 +64,9 @@ namespace MoviesCollection.Api.Controllers
       return moviesDTO;
     }
 
+    /// <summary>
+    /// Obtém um filme pelo seu ID
+    /// </summary>
     [HttpGet("{id:int:min(1)}", Name = "GetMovie")]
     public async Task<ActionResult<MovieDTO>> Get(int id)
     {
@@ -83,6 +91,9 @@ namespace MoviesCollection.Api.Controllers
       return movieDTO;
     }
 
+    /// <summary>
+    /// Inclui um novo filme
+    /// </summary>
     [HttpPost]
     public async Task<ActionResult> Post(MovieDTO movieDto)
     {
@@ -108,6 +119,9 @@ namespace MoviesCollection.Api.Controllers
       return new CreatedAtRouteResult("GetMovie", new { id = movie.Id }, movieDTO);
     }
 
+    /// <summary>
+    /// Edita um filme pelo seu ID
+    /// </summary>
     [HttpPut("{id:int:min(1)}")]
     public async Task<ActionResult> Put(int id, MovieDTO movieDto)
     {
@@ -142,6 +156,9 @@ namespace MoviesCollection.Api.Controllers
       return Ok();
     }
 
+    /// <summary>
+    /// Remove um filme pelo seu ID
+    /// </summary>
     [HttpDelete("{id:int:min(1)}")]
     public async Task<ActionResult<MovieDTO>> Delete(int id)
     {

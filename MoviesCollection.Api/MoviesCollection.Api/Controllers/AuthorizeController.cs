@@ -9,6 +9,8 @@ using System.Text;
 namespace MoviesCollection.Api.Controllers
 {
   [Route("api/authorize")]
+  [ApiConventionType(typeof(DefaultApiConventions))]
+  [Produces("application/json")]
   [ApiController]
   public class AuthorizeController : ControllerBase
   {
@@ -23,12 +25,18 @@ namespace MoviesCollection.Api.Controllers
       _configuration = configuration;
     }
 
+    /// <summary>
+    /// Testa se a API está respondendo
+    /// </summary>
     [HttpGet]
     public ActionResult<string> Get()
     {
       return "AuthorizeController - Acessado em " + DateTime.Now.ToLongDateString();
     }
 
+    /// <summary>
+    /// Inclui um novo usuário
+    /// </summary>
     [HttpPost("register")]
     public async Task<ActionResult> RegisterUser([FromBody] UserDTO userDto)
     {
@@ -48,6 +56,9 @@ namespace MoviesCollection.Api.Controllers
       return Ok(GenerateToken(userDto));
     }
 
+    /// <summary>
+    /// Executa o login
+    /// </summary>
     [HttpPost("login")]
     public async Task<ActionResult> Login([FromBody] UserDTO userDto)
     {

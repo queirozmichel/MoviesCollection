@@ -11,6 +11,8 @@ using System.Text.Json;
 namespace MoviesCollection.Api.Controllers
 {
   [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+  [ApiConventionType(typeof(DefaultApiConventions))]
+  [Produces("application/json")]
   [Route("api/countries")]
   [ApiController]
   public class CountriesController : ControllerBase
@@ -24,6 +26,9 @@ namespace MoviesCollection.Api.Controllers
       _mapper = mapper;
     }
 
+    /// <summary>
+    /// Obtém todos os países
+    /// </summary>
     [HttpGet]
     public async Task<ActionResult<IEnumerable<CountryDTO>>> Get([FromQuery] CountriesParameters countriesParameters)
     {
@@ -59,6 +64,9 @@ namespace MoviesCollection.Api.Controllers
       return countriesDTO;
     }
 
+    /// <summary>
+    /// Obtém um país pelo seu ID
+    /// </summary>
     [HttpGet("{id:int:min(1)}", Name = "GetCountry")]
     public async Task<ActionResult<CountryDTO>> Get(int id)
     {
@@ -83,6 +91,9 @@ namespace MoviesCollection.Api.Controllers
       return countryDTO;
     }
 
+    /// <summary>
+    /// Inclui um novo país
+    /// </summary>
     [HttpPost]
     public async Task<ActionResult> Post(CountryDTO countryDto)
     {
@@ -108,6 +119,9 @@ namespace MoviesCollection.Api.Controllers
       return new CreatedAtRouteResult("GetCountry", new { id = country.Id }, countryDTO);
     }
 
+    /// <summary>
+    /// Edita um país pelo seu ID
+    /// </summary>
     [HttpPut("{id:int:min(1)}")]
     public async Task<ActionResult> Put(int id, CountryDTO countryDto)
     {
@@ -142,6 +156,9 @@ namespace MoviesCollection.Api.Controllers
       return Ok();
     }
 
+    /// <summary>
+    /// Remove um país pelo seu ID
+    /// </summary>
     [HttpDelete("{id:int:min(1)}")]
     public async Task<ActionResult<CountryDTO>> Delete(int id)
     {

@@ -11,6 +11,8 @@ using System.Text.Json;
 namespace MoviesCollection.Api.Controllers
 {
   [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+  [ApiConventionType(typeof(DefaultApiConventions))]
+  [Produces("application/json")]
   [Route("api/directors")]
   [ApiController]
   public class DirectorsController : ControllerBase
@@ -24,6 +26,9 @@ namespace MoviesCollection.Api.Controllers
       _mapper = mapper;
     }
 
+    /// <summary>
+    /// Obtém todos os diretores
+    /// </summary>
     [HttpGet]
     public async Task<ActionResult<IEnumerable<DirectorDTO>>> Get([FromQuery] DirectorsParameters directorsParameters)
     {
@@ -59,6 +64,9 @@ namespace MoviesCollection.Api.Controllers
       return directorsDTO;
     }
 
+    /// <summary>
+    /// Obtém um diretor pelo seu ID
+    /// </summary>
     [HttpGet("{id:int:min(1)}", Name = "GetDirector")]
     public async Task<ActionResult<DirectorDTO>> Get(int id)
     {
@@ -83,6 +91,9 @@ namespace MoviesCollection.Api.Controllers
       return directorDTO;
     }
 
+    /// <summary>
+    /// Inclui um novo diretor
+    /// </summary>
     [HttpPost]
     public async Task<ActionResult> Post(Director directorDto)
     {
@@ -108,6 +119,9 @@ namespace MoviesCollection.Api.Controllers
       return new CreatedAtRouteResult("GetDirector", new { id = director.Id }, directorDTO);
     }
 
+    /// <summary>
+    /// Edita um diretor pelo seu ID
+    /// </summary>
     [HttpPut("{id:int:min(1)}")]
     public async Task<ActionResult> Put(int id, DirectorDTO directorDto)
     {
@@ -142,6 +156,9 @@ namespace MoviesCollection.Api.Controllers
       return Ok();
     }
 
+    /// <summary>
+    /// Remove um diretor pelo seu ID
+    /// </summary>
     [HttpDelete("{id:int:min(1)}")]
     public async Task<ActionResult<DirectorDTO>> Delete(int id)
     {

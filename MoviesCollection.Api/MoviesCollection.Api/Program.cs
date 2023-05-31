@@ -8,6 +8,7 @@ using MoviesCollection.Api.Context;
 using MoviesCollection.Api.DTOs.Mappings;
 using MoviesCollection.Api.Helpers;
 using MoviesCollection.Api.Repository;
+using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -44,7 +45,7 @@ builder.Services.AddEndpointsApiExplorer();
 //Configuração do swagger para poder aceitar o JWT token.
 builder.Services.AddSwaggerGen(x =>
 {
-  x.SwaggerDoc("v1", new OpenApiInfo { Title = "MoviesCollection.Api", Version = "v1" });
+  x.SwaggerDoc("v1", new OpenApiInfo { Title = "Acervo de Filmes", Version = "v1" });
   x.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
   {
     Name = "Authorization",
@@ -68,6 +69,9 @@ builder.Services.AddSwaggerGen(x =>
       new string[]{}
     }
   });
+  var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+  var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+  x.IncludeXmlComments(xmlPath);
 });
 
 var app = builder.Build();

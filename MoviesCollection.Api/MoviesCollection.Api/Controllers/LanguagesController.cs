@@ -11,6 +11,8 @@ using System.Text.Json;
 namespace MoviesCollection.Api.Controllers
 {
   [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+  [ApiConventionType(typeof(DefaultApiConventions))]
+  [Produces("application/json")]
   [Route("api/languages")]
   [ApiController]
   public class LanguagesController : ControllerBase
@@ -24,6 +26,9 @@ namespace MoviesCollection.Api.Controllers
       _mapper = mapper;
     }
 
+    /// <summary>
+    /// Obtém todos os idiomas
+    /// </summary>
     [HttpGet]
     public async Task<ActionResult<IEnumerable<LanguageDTO>>> Get([FromQuery] LanguageParameters languageParameters)
     {
@@ -59,6 +64,9 @@ namespace MoviesCollection.Api.Controllers
       return languagesDTO;
     }
 
+    /// <summary>
+    /// Obtém um idioma pelo seu ID
+    /// </summary>
     [HttpGet("{id:int:min(1)}", Name = "GetLanguage")]
     public async Task<ActionResult<LanguageDTO>> Get(int id)
     {
@@ -83,6 +91,9 @@ namespace MoviesCollection.Api.Controllers
       return languageDTO;
     }
 
+    /// <summary>
+    /// Inclui um novo idioma
+    /// </summary>
     [HttpPost]
     public async Task<ActionResult> Post(LanguageDTO languageDto)
     {
@@ -108,6 +119,9 @@ namespace MoviesCollection.Api.Controllers
       return new CreatedAtRouteResult("GetLanguage", new { id = language.Id }, languageDTO);
     }
 
+    /// <summary>
+    /// Edita um idioma pelo seu ID
+    /// </summary>
     [HttpPut("{id:int:min(1)}")]
     public async Task<ActionResult> Put(int id, LanguageDTO languageDto)
     {
@@ -142,6 +156,9 @@ namespace MoviesCollection.Api.Controllers
       return Ok();
     }
 
+    /// <summary>
+    /// Remove um idioma pelo seu ID
+    /// </summary>
     [HttpDelete("{id:int:min(1)}")]
     public async Task<ActionResult<LanguageDTO>> Delete(int id)
     {

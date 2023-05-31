@@ -11,6 +11,8 @@ using System.Text.Json;
 namespace MoviesCollection.Api.Controllers
 {
   [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+  [ApiConventionType(typeof(DefaultApiConventions))]
+  [Produces("application/json")]
   [Route("api/genres")]
   [ApiController]
   public class GenresController : ControllerBase
@@ -24,6 +26,9 @@ namespace MoviesCollection.Api.Controllers
       _mapper = mapper;
     }
 
+    /// <summary>
+    /// Obtém todos os gêneros
+    /// </summary>
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GenreDTO>>> Get([FromQuery] GenresParameters genresParameters)
     {
@@ -59,6 +64,9 @@ namespace MoviesCollection.Api.Controllers
       return genresDTO;
     }
 
+    /// <summary>
+    /// Obtém um gênero pelo seu ID
+    /// </summary>
     [HttpGet("{id:int:min(1)}", Name = "GetGenre")]
     public async Task<ActionResult<GenreDTO>> Get(int id)
     {
@@ -82,6 +90,9 @@ namespace MoviesCollection.Api.Controllers
       return genreDTO;
     }
 
+    /// <summary>
+    /// Inclui um novo gênero
+    /// </summary>
     [HttpPost]
     public async Task<ActionResult> Post(GenreDTO genreDto)
     {
@@ -107,6 +118,9 @@ namespace MoviesCollection.Api.Controllers
       return new CreatedAtRouteResult("GetGenre", new { id = genre.Id }, genreDTO);
     }
 
+    /// <summary>
+    /// Edita um gênero pelo seu ID
+    /// </summary>
     [HttpPut("{id:int:min(1)}")]
     public async Task<ActionResult> Put(int id, Genre genreDto)
     {
@@ -141,6 +155,9 @@ namespace MoviesCollection.Api.Controllers
       return Ok();
     }
 
+    /// <summary>
+    /// Remove um gênero pelo seu ID
+    /// </summary>
     [HttpDelete("{id:int:min(1)}")]
     public async Task<ActionResult<GenreDTO>> Delete(int id)
     {

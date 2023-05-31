@@ -11,6 +11,8 @@ using System.Text.Json;
 namespace MoviesCollection.Api.Controllers
 {
   [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+  [ApiConventionType(typeof(DefaultApiConventions))]
+  [Produces("application/json")]
   [Route("api/parentalratings")]
   [ApiController]
   public class ParentalRatingsController : ControllerBase
@@ -24,6 +26,9 @@ namespace MoviesCollection.Api.Controllers
       _mapper = mapper;
     }
 
+    /// <summary>
+    /// Obtém todos os controles parentais
+    /// </summary>
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ParentalRatingDTO>>> Get([FromQuery] ParentalRatingsParameters parentalRatingsParameters)
     {
@@ -59,6 +64,9 @@ namespace MoviesCollection.Api.Controllers
       return parentalRatingsDTO;
     }
 
+    /// <summary>
+    /// Obtém um controle parental pelo seu ID
+    /// </summary>
     [HttpGet("{id:int:min(1)}", Name = "GetParentalRating")]
     public async Task<ActionResult<ParentalRatingDTO>> Get(int id)
     {
@@ -83,6 +91,9 @@ namespace MoviesCollection.Api.Controllers
       return parentalRatingDTO;
     }
 
+    /// <summary>
+    /// Inclui um novo controle parental
+    /// </summary>
     [HttpPost]
     public async Task<ActionResult> Post(ParentalRatingDTO parentalRatingDto)
     {
@@ -107,6 +118,9 @@ namespace MoviesCollection.Api.Controllers
       return new CreatedAtRouteResult("GetParentalRating", new { id = parentalRating.Id }, parentalRatingDTO);
     }
 
+    /// <summary>
+    /// Edita um controle parental pelo seu ID
+    /// </summary>
     [HttpPut("{id:int:min(1)}")]
     public async Task<ActionResult> Put(int id, ParentalRatingDTO parentalRatingDto)
     {
@@ -140,6 +154,9 @@ namespace MoviesCollection.Api.Controllers
       return Ok();
     }
 
+    /// <summary>
+    /// Remove um controle parental pelo seu ID
+    /// </summary>
     [HttpDelete("{id:int:min(1)}")]
     public async Task<ActionResult<ParentalRatingDTO>> Delete(int id)
     {
